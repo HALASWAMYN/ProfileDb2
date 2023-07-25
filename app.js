@@ -1,25 +1,26 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const multer = require('multer')
+const bodyParser = require('body-parser');
 
 
+
+const PORT = process.env.PORT || 4000
 //require database models
 const Work = require('./models/work')
 const Next = require('./models/save')
-const Img = require('./models/img')
+const Img = require('./models/img')             
 
-
-//database
-const mongoose = require('mongoose')
-mongoose.set('strictQuery', false)
 
 //middlewears
+app.use(bodyParser.json());
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 
-
+//database
+const mongoose = require('mongoose')
+mongoose.set('strictQuery', false)
 let dbUrl = 'mongodb+srv://halaswamyn2000:0IqxSchH32DPl1kJ@cluster0.stqarem.mongodb.net/work'
 mongoose.connect(dbUrl).then(() => {
     console.log('dataBase connected')
@@ -90,39 +91,10 @@ app.get('/next-work/:id', async (req, res) => {
     }
 })
 
-//.............
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-app.post('/image', upload.single('image'), async (req, res) => {
-    try {
-        const uploadImage = new Img({
-            image: {
-                data: req.file.buffer,
-                contentType: req.file.mimetype
-            }
-        });
-
-        await uploadImage.save();
-        res.send({ message: 'Uploaded' });
-    } catch (error) {
-        res.send({ message: 'Upload failed' });
-    }
-});
-
-app.get('/image', async(req, res) => {
-
-    try {
-        let fetchImage = await Img.find()
-        res.json(fetchImage)
-    } catch (error) {
-        res.send(error)
-    }
-}
-)
 
 
 
-app.listen(4000, () => {
+
+app.listen(PORT, () => {
     console.log('listenig localhost 4000')
 })
