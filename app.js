@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 4000
 //require database models
 const Work = require('./models/work')
 const Next = require('./models/save')
-const Img = require('./models/img')             
 
 
 //middlewears
@@ -21,10 +20,17 @@ app.use(cors())
 //database
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
-let dbUrl = 'mongodb+srv://halaswamyn2000:0IqxSchH32DPl1kJ@cluster0.stqarem.mongodb.net/work'
-mongoose.connect(dbUrl).then(() => {
-    console.log('dataBase connected')
-})
+const connectDB = async () => {
+  try {
+
+    const uri = "mongodb+srv://halaswamyn2000:0IqxSchH32DPl1kJ@cluster0.stqarem.mongodb.net/work"
+    await mongoose.connect(uri)
+    console.log(`mangoDB connected:`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1)
+  }
+}
 
 
 app.post('/add-work', async (req, res) => {
@@ -95,6 +101,8 @@ app.get('/next-work/:id', async (req, res) => {
 
 
 
-app.listen(PORT, () => {
-    console.log('listenig localhost 4000')
-})
+connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`listening to server ${PORT}`)
+    })
+  })
